@@ -1,0 +1,24 @@
+#!/bin/sh
+
+[[ $1 == "refresh" ]] && kill -44 $(pidof dwmblocks) && exit 1
+
+color_g="#666666"
+state="$(mpc status %state%)"
+
+filter() { sed "/^volume:/d;/\\[paused\\].*/d;/\\[playing\\].*/d;/^ERROR/Q" | paste -sd ' ' -;}
+
+# start sb-mpdup if not already running
+pidof -x sb-mpdup >/dev/null 2>&1 || sb-mpdup >/dev/null 2>&1 &
+
+# display nothing if playlist is empty
+[[ "$(mpc status %length%)" == 0 ]] && exit
+
+status="$(mpc status | filter)"
+
+# check if title is too long or empty
+[[ ${#status} -ge 32 ]] && status="${status:0:29}..."
+[[ ${#status} -eq 0  ]] && status="..."
+
+# change color of paused state
+[[ $state == "paused"  ]] && echo -e "^c$color_g^${status:0:32}^d^"
+[[ $state == "playing" ]] && echo -e "${status:0:32}"

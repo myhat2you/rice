@@ -1,0 +1,49 @@
+#!/bin/sh
+
+color_g="$(xrdb -get color2)"  #20C080
+color_b="$(xrdb -get color12)" #5FB0D0
+color_o="$(xrdb -get color11)" #FF6F6F
+color_r="$(xrdb -get color9)"  #FF5560
+
+pub_ip="$(curl ifconfig.me --silent)"
+loc_ip="$(ip -o -4 address show | awk 'NR==2 { gsub(/\/.*/, "", $4); print $4 }')"
+dns_ip="$(cat /etc/resolv.conf  | awk 'NR==2 {print $2}')"
+vpn_ip="$VPN_IP"
+vpn_st="$(systemctl status openvpn-client@client 2>&1 | grep Active | awk '{print $2}')"
+
+case $BUTTON in
+	1) notify-send " $(grep "^\s*w" /proc/net/wireless | awk '{ print int($3 * 100 / 70) "%" }')";;
+	2) printf "$icon$pub_ip\n"
+esac
+
+warning(){
+	color="^c#e4444f^" #red
+	notify-send -u normal "$1" "$2"
+	echo -e "$color$1^d^$loc_ip"
+	exit 1
+}
+
+# check local local and online network connections
+if [[ ! $loc_ip ]]; then
+	echo -e "^c$color_r^[ N/A ]^d^" && exit
+elif [[ $(ping 1.1.1.1 -c 1 -W 1 | grep '100%') ]]; then
+	echo -e "^c$color_o^[ ... ]^d^" && exit
+fi
+
+# check dns status
+if [[ $dns_ip == "1.1.1.1" ]] || [[ $dns_ip == "1.0.0.1" ]]; then
+	icon=""
+	color=$color_b
+else
+	warning "" "DNS\n[$dns_ip]"
+fi
+
+# check vpn status
+if [[ $vpn_st == "active" ]]; then
+	icon=""
+	color=$color_g
+    	[[ ! -d "/sys/class/net/tun0" ]] && warning "" "Tunnel"
+    	[[ $pub_ip != $vpn_ip ]] && warning "" "Public IP\n[$pub_ip]"
+fi
+
+echo -e "^c$color^$icon^d^ $loc_ip"

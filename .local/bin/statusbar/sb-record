@@ -1,0 +1,6 @@
+#!/bin/sh
+
+icon="$(cat "/tmp/recordingicon" 2>/dev/null)"
+color_r="#E4444F"
+
+[[ -z $icon ]] && exit || echo -e "^c$color_r^$icon^d^"

@@ -1,0 +1,44 @@
+#!/bin/sh
+# prints all batteries, their percentage and a representative emoji.
+# notifies a warning when battery is critically low.
+
+color_g="^c#20C080^" #20C080
+color_b="^c#5FB0D0^" #5FB0D0
+color_o="^c#FF6F6F^" #FF6F6F
+color_p="^c#FF558A^" #FF558A
+color_r="^c#FF5560^" #FF5560
+
+bat_100="^d^"
+bat_075="^d^"
+bat_050="^d^"
+bat_025="^d^"
+bat_000="^d^"
+
+# loop through all attached batteries and format the info
+for battery in /sys/class/power_supply/BAT?*; do
+	capacity="$(cat "$battery/capacity" 2>&1)"
+	charging="$(cat "$battery/status" 2>&1)"
+
+	## exit if no battery exists
+	[[ -n $battery ]] && exit
+
+	# determine color and charge symbol
+	case "$capacity" in
+		100)        color="$color_g"; battery="$charge_100";;
+		[9-9][0-9]) color="$color_g"; battery="$charge_100";;
+		[6-8][0-9]) color="$color_b"; battery="$charge_075";;
+		[4-5][0-9]) color="$color_o"; battery="$charge_050";;
+		[3-3][0-9]) color="$color_o"; battery="$charge_025";;
+		[1-2][0-9]) color="$color_p"; battery="$charge_025";;
+		[0-9])      color="$color_r"; battery="$charge_000";;
+	esac
+
+	# check charging status and warn at critical capacity
+	if [ "$charging" != "Discharging" ]; then
+	       cable="^d^ "
+       elif [[ $capacity -le 9 ]]; then
+		notify-send -u critical " Warning: $capacity%"
+	fi
+
+	echo -e "$color$battery $capacity% $color$cable"
+done

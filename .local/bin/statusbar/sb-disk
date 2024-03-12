@@ -1,0 +1,28 @@
+#!/bin/sh
+# Status bar module for disk space
+# $1 should be drive mountpoint, otherwise assumed /.
+
+icon=""
+color_b="$(xrdb -get color12)" #5FB0D0
+color_o="$(xrdb -get color11)" #FF6F6F
+color_p="$(xrdb -get color13)" #FF558A
+color_r="$(xrdb -get color9)"  #FF5560
+
+location=${1:-/}
+drive="$(df -h "$location" | awk ' /[0-9]/ {print $3 "/" $2}')"
+d_perc="$(df -h "$location" | awk ' /[0-9]/ {print $5}' | sed 's/[^0123456789.].*//')"
+
+case $BUTTON in
+	1) notify-send " Disk space" "$(df -h --output=target,used,size)" ;;
+esac
+
+case $d_perc in
+	[0-9])      color=$color_b;;
+	[1-4][0-9]) color=$color_b;;
+	[5-6][0-9]) color=$color_o;;
+	[7-8][0-9]) color=$color_p;;
+	*)          color=$color_r;;
+esac
+
+[ -d "$location" ] || exit
+echo -e "^c$color^$icon^d^ $drive"
