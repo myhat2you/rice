@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Displays number of unread news items and an loading icon if updating.
+# When clicked, brings up `newsboat`.
+
+color_g="$(xrdb -get color2)" #20C080
+#color_b="$(xrdb -get color10)" #40DD8D
+icon="📰"
+
+case $BUTTON in
+  1) setsid "$TERMINAL" -e newsboat ;;
+	2) setsid -f newsup >/dev/null && exit ;;
+  3) notify-send "📰 News module" "\- Shows unread news items
+- Shows  if updating with \`newsup\`
+- Left click opens newsboat
+- Middle click syncs RSS feed
+<b>Note:</b> Only one instance of newsboat (including updates) may be running at a time." ;;
+	6) setsid -f "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+[[ -f /tmp/newsupdate ]] && cat /tmp/newsupdate || unread="$(newsboat -x print-unread | awk '{print $1}')"
+
+[[ $unread > 0 ]] && printf "^c$color_g^$icon^d^ $unread"; 
+
+#echo "$(newsboat -x print-unread | awk '{ if($1>0) print "'^c$color_g^$icon^d^' " $1}') $(cat "${XDG_CONFIG_HOME:-$HOME/.config}"/newsboat/.update 2>/dev/null)"

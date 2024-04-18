@@ -1,6 +1,6 @@
 #!/bin/sh
 
-[[ $1 == "refresh" ]] && kill -43 $(pidof dwmblocks) && exit 1
+[[ $1 == "refresh" ]] && kill -44 $(pidof dwmblocks) && exit 1
 vol="$(wpctl get-volume @DEFAULT_AUDIO_SINK@)"
 
 # If muted, print   and exit.

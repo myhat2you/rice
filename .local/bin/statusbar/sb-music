@@ -1,6 +1,6 @@
 #!/bin/sh
 
-[[ $1 == "refresh" ]] && kill -44 $(pidof dwmblocks) && exit 1
+[[ $1 == "refresh" ]] && kill -45 $(pidof dwmblocks) && exit 1
 
 color_g="#666666"
 state="$(mpc status %state%)"

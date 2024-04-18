@@ -22,7 +22,15 @@ for battery in /sys/class/power_supply/BAT?*; do
 	## exit if no battery exists
 	[[ -n $battery ]] && exit
 
+	#case "$(cat "$battery/status" 2>&1)" in
+		#"Full") status="" ;;
+		#"Charging") status="" ;;
+		#"Discharging")  status="" ;;
+		#"Not charging") status="" ;;
+		#"Unknown") status="" ;;
 	# determine color and charge symbol
+  #esac
+
 	case "$capacity" in
 		100)        color="$color_g"; battery="$charge_100";;
 		[9-9][0-9]) color="$color_g"; battery="$charge_100";;
