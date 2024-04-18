@@ -1,0 +1,3 @@
+#!/bin/sh
+
+groff -mom ~/.local/src/dwm/mars.mom -Tpdf | zathura -
