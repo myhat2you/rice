@@ -19,7 +19,7 @@ esac
 warning(){
 	color="^c#e4444f^" #red
 	notify-send -u normal "$1" "$2"
-	echo -e "$color$1^d^$loc_ip"
+	echo -e "$color$1^d^ $loc_ip"
 	exit 1
 }
 
