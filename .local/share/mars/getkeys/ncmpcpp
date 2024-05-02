@@ -19,3 +19,5 @@ ncmpcpp is the music player.
 	s - Search
 	v - Visualizer
 	P - Playlist
+	L - Fetch lyrics
+Show lyrics page from the playlist tab with ctrl+>
