@@ -7,25 +7,46 @@ color_b="$(xrdb -get color12)" #5FB0D0
 color_o="$(xrdb -get color11)" #FF6F6F
 color_p="$(xrdb -get color13)" #FF558A
 color_r="$(xrdb -get color9)"  #FF5560
+drives=""
 
-location=${1:-/}
-drive="$(df -h "$location" | awk ' /[0-9]/ {print $3 "/" $2}')"
-d_perc="$(df -h "$location" | awk ' /[0-9]/ {print $5}' | sed 's/[^0123456789.].*//')"
+drive_used(){
+	used="$(df -h "$1" | grep "$1" | awk '{ print $3 }')"
+	echo $used
+}
+
+drive_size(){
+	size="$(lsblk | grep "[^,]\+$1$" | awk '{ print $4 }')"
+	echo $size
+}
+
+drive_perc(){
+	perc="$(df -BGB "$1" | grep "$1" | awk '{ print $5 }' | sed 's/[^0123456789.].*//')"
+	echo $perc
+}
+
+drive_list(){
+	list="drive\tused\tsize\tperc\n"
+	for i in "${drives[@]}"; do
+		list+="$i\t$(drive_used $i)\t$(drive_size $i)\t$(drive_perc $i)%\n"
+	done
+	echo $list
+}
+
+location=${1:-/home}
+dused=$(drive_used "$location")
+dsize=$(drive_size "$location")
+dperc=$(drive_perc "$location")
 
 # make list of useful mounted drives for button notification
-drives="/ /boot /home"
-
-mount_mnt="$(df -h | grep mnt | wc -l)"
-mount_media="$(df -h | grep media | wc -l)"
-
-[[ $mount_mnt == 1 ]] && drives+=" /mnt"
-[[ $mount_media == 1 ]] && drives+=" /media"
+drives=("/" "/boot" "/home")
+[[ -n $(df -h | grep /mnt)   ]] && drives+=("/mnt")
+[[ -n $(df -h | grep /media) ]] && drives+=("/media")
 
 case $BUTTON in
-  1) notify-send " Disk space" "$(df -h --output=target,used,size $drives)" ;;
+  1) notify-send " Disk space" "$(drive_list $drives)" ;;
 esac
 
-case $d_perc in
+case $dperc in
 	[0-9])      color=$color_b;;
 	[1-4][0-9]) color=$color_b;;
 	[5-6][0-9]) color=$color_o;;
@@ -34,4 +55,4 @@ case $d_perc in
 esac
 
 [ -d "$location" ] || exit
-echo -e "^c$color^$icon^d^ $drive"
+echo -e "^c$color^$icon^d^ $dused/$dsize"
