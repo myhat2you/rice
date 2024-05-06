@@ -9,7 +9,7 @@ icon=""
 color_o="$(xrdb -get color11)" #FF6F6F
 color_r="$(xrdb -get color9)"  #FF5560
 
-packages="$(pacman -Qu | grep -Fcv '[ignored]' | sed 's/^//;s/^0$/0/g')"
+[[ -f /tmp/pacupdate ]] && cat /tmp/pacupdate || packages="$(pacman -Qu | grep -Fcv '[ignored]' | sed 's/^//;s/^0$/0/g')"
 
 sync(){ sudo pacman -Sy 2>/dev/null 1>/dev/null || notify-send "Error synchronizing updates." ; }
 

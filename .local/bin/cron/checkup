@@ -2,16 +2,22 @@
 
 # Syncs repositories and downloads updates, meant to be run as a cronjob.
 
+color_g="$(xrdb -get color9)" ##FF5560
+
 notify-send " Repository Sync" "Checking for package updates..."
 
-sudo pacman -Syyuw --noconfirm || notify-send --urgent " Error downloading updates.
+echo "^c$color_g^^d^$packages" > /tmp/pacupdate
+pkill -RTMIN+3 "${STATUSBAR:-dwmblocks}"
+
+sudo pacman -Syyuw --noconfirm || notify-send -u critical " Error downloading updates.
 
 Check your internet connection, if pacman is already running, or run update manually to see errors."
+rm -f /tmp/pacupdate
 pkill -RTMIN+3 "${STATUSBAR:-dwmblocks}"
 
 if pacman -Qu | grep -v "\[ignored\]"
 then
-	notify-send " Repository Sync" "Updates available. Click statusbar icon () for update."
+	notify-send " Repository Sync" "Updates available.\nClick () to update."
 else
-	notify-send " Repository Sync"  "Sync complete. No new packages for update."
+	notify-send " Repository Sync" -u low "Sync complete, no new packages."
 fi
