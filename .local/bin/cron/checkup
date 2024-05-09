@@ -4,6 +4,8 @@
 
 color_g="$(xrdb -get color9)" ##FF5560
 
+# export dbus address for dunst to work with cron
+#eval "export $(grep -z DBUS_SESSION_BUS_ADDRESS < /proc/$(pgrep -u $LOGNAME dunst)/environ | tr '\0' '\n')"
 notify-send " Repository Sync" "Checking for package updates..."
 
 echo "^c$color_g^^d^$packages" > /tmp/pacupdate

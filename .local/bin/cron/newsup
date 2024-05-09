@@ -5,6 +5,8 @@
 
 color_g="$(xrdb -get color10)" #40DD8D
 
+# export dbus address for dunst to work with cron
+#eval "export $(grep -z DBUS_SESSION_BUS_ADDRESS < /proc/$(pgrep -u $LOGNAME dunst)/environ | tr '\0' '\n')"
 /usr/bin/notify-send " Updating RSS feeds..."
 
 pgrep -f newsboat$ && /usr/bin/xdotool key --window "$(/usr/bin/xdotool search --name "^newsboat$")" R && exit
@@ -14,4 +16,4 @@ pkill -RTMIN+5 "${STATUSBAR:-dwmblocks}"
 /usr/bin/newsboat -x reload
 rm -f /tmp/newsupdate
 pkill -RTMIN+5 "${STATUSBAR:-dwmblocks}"
-/usr/bin/notify-send " RSS feed update complete."
+/usr/bin/notify-send -u low " RSS feed update complete."
