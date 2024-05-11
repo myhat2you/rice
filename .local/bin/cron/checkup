@@ -2,13 +2,12 @@
 
 # Syncs repositories and downloads updates, meant to be run as a cronjob.
 
-color_g="$(xrdb -get color9)" ##FF5560
-
 # export dbus address for dunst to work with cron
-#eval "export $(grep -z DBUS_SESSION_BUS_ADDRESS < /proc/$(pgrep -u $LOGNAME dunst)/environ | tr '\0' '\n')"
+PID=$(pgrep startx)
+export DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-|sed 's/\x0//g')
 notify-send " Repository Sync" "Checking for package updates..."
 
-echo "^c$color_g^^d^$packages" > /tmp/pacupdate
+echo "$packages" > /tmp/pacupdate
 pkill -RTMIN+3 "${STATUSBAR:-dwmblocks}"
 
 sudo pacman -Syyuw --noconfirm || notify-send -u critical " Error downloading updates.
