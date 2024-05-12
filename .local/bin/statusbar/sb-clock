@@ -6,7 +6,7 @@ output="$(date '+%d/%m/%y (%a) %I:%M%p')"
 [[ -f $tmpfile ]] && output="$(cat $tmpfile) | $(date +%I:%M%p)"
 
 case $BUTTON in
-	1) notify-send "This Month" "$(cal --color=never)" && notify-send "Appointments" "$(calcurse -d3)" ;;
+	1) notify-send "This Month" "$(cal | sed "s/\<$(date +'%e')\>/<b><span color='cyan'>&<\/span><\/b>/")" && notify-send "Appointments" "$(calcurse -d3)" ;;
 esac
 
 echo -e " $output"
